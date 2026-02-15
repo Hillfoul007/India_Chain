@@ -58,36 +58,41 @@ export default function Overview() {
       if (data?.session?.user) {
         setUser(data.session.user);
 
-        // Fetch wallet data
-        const { data: wallet } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', data.session.user.id)
-          .single();
+        try {
+          // Fetch wallet data
+          const { data: wallet } = await supabase
+            .from('wallets')
+            .select('*')
+            .eq('user_id', data.session.user.id)
+            .maybeSingle();
 
-        // Fetch shipments count
-        const { data: shipments, count } = await supabase
-          .from('shipments')
-          .select('*', { count: 'exact' })
-          .eq('user_id', data.session.user.id);
+          // Fetch shipments count
+          const { data: shipments, count } = await supabase
+            .from('shipments')
+            .select('*', { count: 'exact' })
+            .eq('user_id', data.session.user.id);
 
-        // Fetch credit score
-        const { data: creditData } = await supabase
-          .from('credit_scores')
-          .select('*')
-          .eq('user_id', data.session.user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          // Fetch credit score
+          const { data: creditData } = await supabase
+            .from('credit_scores')
+            .select('*')
+            .eq('user_id', data.session.user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (wallet) {
-          setDidAddress(wallet.did_address);
           setStats({
-            walletBalance: parseFloat(wallet.wallet_balance),
+            walletBalance: wallet ? parseFloat(wallet.wallet_balance) : 0,
             shipmentCount: count || 0,
-            kycStatus: wallet.kyc_status,
+            kycStatus: wallet?.kyc_status || 'pending',
             creditScore: creditData?.score || 0,
           });
+
+          if (wallet?.did_address) {
+            setDidAddress(wallet.did_address);
+          }
+        } catch (error) {
+          console.error('Error fetching dashboard data:', error);
         }
       }
     };
