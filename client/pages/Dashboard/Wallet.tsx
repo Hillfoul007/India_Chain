@@ -33,22 +33,26 @@ export default function Wallet() {
       if (authData?.session?.user) {
         setUser(authData.session.user);
 
-        // Fetch wallet
-        const { data: walletData } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', authData.session.user.id)
-          .single();
+        try {
+          // Fetch wallet
+          const { data: walletData } = await supabase
+            .from('wallets')
+            .select('*')
+            .eq('user_id', authData.session.user.id)
+            .maybeSingle();
 
-        // Fetch KYC records
-        const { data: kycData } = await supabase
-          .from('kyc_verifications')
-          .select('*')
-          .eq('user_id', authData.session.user.id)
-          .order('created_at', { ascending: false });
+          // Fetch KYC records
+          const { data: kycData } = await supabase
+            .from('kyc_verifications')
+            .select('*')
+            .eq('user_id', authData.session.user.id)
+            .order('created_at', { ascending: false });
 
-        if (walletData) setWallet(walletData);
-        if (kycData) setKycRecords(kycData);
+          if (walletData) setWallet(walletData);
+          if (kycData) setKycRecords(kycData);
+        } catch (error) {
+          console.error('Error fetching wallet data:', error);
+        }
       }
     };
 
@@ -69,15 +73,17 @@ export default function Wallet() {
     setVerifying(true);
     try {
       // Create KYC verification record
-      const { data: kycRecord } = await supabase
+      const { data: kycRecordsArray } = await supabase
         .from('kyc_verifications')
         .insert({
           user_id: user.id,
           verification_type: 'zk-kyc',
           status: 'pending',
         })
-        .select()
-        .single();
+        .select();
+
+      const kycRecord = kycRecordsArray?.[0];
+      if (!kycRecord) throw new Error('Failed to create KYC record');
 
       // Simulate ZK-KYC verification process (3 second delay)
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -109,7 +115,7 @@ export default function Wallet() {
         .from('wallets')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const { data: updatedKyc } = await supabase
         .from('kyc_verifications')
@@ -139,7 +145,7 @@ export default function Wallet() {
           <p className="text-gray-400">Manage your decentralized identity and wallet</p>
         </div>
 
-        {wallet && (
+        {wallet ? (
           <>
             {/* DID Address Card */}
             <motion.div
@@ -297,6 +303,17 @@ export default function Wallet() {
               </motion.div>
             )}
           </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="glass-card p-12 rounded-xl text-center"
+          >
+            <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-300 mb-2">Wallet Not Found</h3>
+            <p className="text-gray-500">Your wallet is being created. Please refresh the page.</p>
+          </motion.div>
         )}
       </motion.div>
     </DashboardLayout>
