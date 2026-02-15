@@ -257,6 +257,183 @@ const Beneficiaries = () => {
   );
 };
 
+const HowItWorks = () => {
+  const steps = [
+    {
+      number: '01',
+      title: 'Sign Up & Get DID',
+      description: 'Create your account and instantly receive a unique Decentralized Identifier (DID) - your digital identity on the blockchain.',
+      icon: '🆔'
+    },
+    {
+      number: '02',
+      title: 'Verify Identity (ZK-KYC)',
+      description: 'Complete zero-knowledge KYC verification. Your privacy is protected - we verify without storing sensitive data.',
+      icon: '✓'
+    },
+    {
+      number: '03',
+      title: 'Create Shipments & Trade',
+      description: 'Start trading and create shipments. Every transaction builds your on-chain track record and reputation.',
+      icon: '📦'
+    },
+    {
+      number: '04',
+      title: 'Get AI Credit Score',
+      description: 'Receive a transparent, AI-driven credit score based on your delivery reliability, KYC status, activity, and financial health.',
+      icon: '📊'
+    },
+    {
+      number: '05',
+      title: 'Access Fair Finance',
+      description: 'With your DID and credit score, access lending from lenders at fair rates backed by transparent data.',
+      icon: '💰'
+    },
+    {
+      number: '06',
+      title: 'Grow Your Reputation',
+      description: 'Build an immutable reputation profile. Your on-chain history follows you forever - establishing lifetime creditworthiness.',
+      icon: '🚀'
+    }
+  ];
+
+  return (
+    <section className="py-20 px-4 bg-white/5">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold font-display mb-6 text-white">
+            How <span className="text-gradient">IndiaChain</span> Works
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            A simple 6-step journey from identity to finance
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="glass-card p-8 rounded-xl relative"
+            >
+              <div className="text-6xl font-bold text-orange-500/20 mb-4">{step.number}</div>
+              <div className="text-5xl mb-4">{step.icon}</div>
+              <h3 className="text-xl font-bold font-display text-white mb-3">{step.title}</h3>
+              <p className="text-gray-400">{step.description}</p>
+
+              {index < steps.length - 1 && (
+                <div className="absolute -right-3 top-1/2 transform -translate-y-1/2 hidden md:block">
+                  <ArrowRight className="w-6 h-6 text-orange-500/30" />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const CreditScoreExplained = () => {
+  const factors = [
+    {
+      name: 'Delivery Reliability',
+      weight: '30%',
+      description: 'Percentage of shipments successfully delivered',
+      icon: '📦'
+    },
+    {
+      name: 'KYC Trust',
+      weight: '30%',
+      description: 'Identity verification status (95 if verified, 30 if pending)',
+      icon: '🔐'
+    },
+    {
+      name: 'Activity Volume',
+      weight: '20%',
+      description: 'Number of transactions and trades on the platform',
+      icon: '📈'
+    },
+    {
+      name: 'Financial Health',
+      weight: '20%',
+      description: 'Wallet balance and liquidity indicators',
+      icon: '💳'
+    }
+  ];
+
+  return (
+    <section className="py-20 px-4">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold font-display mb-6 text-white">
+            Transparent <span className="text-gradient">Credit Scoring</span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Score 0-1000 based on 4 transparent factors. No hidden algorithms, no black boxes.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {factors.map((factor, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="glass-card p-6 rounded-xl"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="text-4xl">{factor.icon}</div>
+                <div className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm">
+                  {factor.weight}
+                </div>
+              </div>
+              <h3 className="text-xl font-bold font-display text-white mb-2">{factor.name}</h3>
+              <p className="text-gray-400">{factor.description}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="glass-card p-8 rounded-xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/20"
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div className="text-4xl">📊</div>
+            <h3 className="text-2xl font-bold font-display text-white">Formula</h3>
+          </div>
+          <code className="text-orange-400 font-mono text-sm md:text-base block bg-black/30 p-4 rounded-lg overflow-x-auto">
+            Score = (Reliability×0.3 + KYC×0.3 + Activity×0.2 + Financial×0.2) × 10
+          </code>
+          <p className="text-gray-400 text-sm mt-4">
+            This transparent formula replaces opaque traditional credit systems. You control your score through your actions.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
 const CTA = () => {
   return (
     <section className="py-20 px-4">
@@ -335,7 +512,9 @@ export default function Index() {
     <div className="bg-background min-h-screen overflow-hidden">
       <Hero />
       <WhyIndiaChain />
+      <HowItWorks />
       <Pillars />
+      <CreditScoreExplained />
       <Beneficiaries />
       <CTA />
       <Footer />

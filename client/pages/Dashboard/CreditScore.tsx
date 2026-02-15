@@ -144,20 +144,24 @@ export default function CreditScore() {
       if (authData?.session?.user) {
         setUser(authData.session.user);
 
-        const { data: scoreData } = await supabase
-          .from('credit_scores')
-          .select('*')
-          .eq('user_id', authData.session.user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+        try {
+          const { data: scoreData } = await supabase
+            .from('credit_scores')
+            .select('*')
+            .eq('user_id', authData.session.user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (scoreData) {
-          setCreditScore({
-            score: scoreData.score,
-            factors: scoreData.factors,
-            analysis: scoreData.ai_analysis,
-          });
+          if (scoreData) {
+            setCreditScore({
+              score: scoreData.score,
+              factors: scoreData.factors,
+              analysis: scoreData.ai_analysis,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching credit score:', error);
         }
       }
     };
@@ -177,14 +181,14 @@ export default function CreditScore() {
         .from('wallets')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const { count: shipmentCount } = await supabase
         .from('shipments')
         .select('*', { count: 'exact' })
         .eq('user_id', user.id);
 
-      const { data: deliveredShipments, count: deliveredCount } = await supabase
+      const { count: deliveredCount } = await supabase
         .from('shipments')
         .select('*', { count: 'exact' })
         .eq('user_id', user.id)
@@ -197,7 +201,7 @@ export default function CreditScore() {
       const deliveryReliability = deliveredCount ? Math.min(100, (deliveredCount / (shipmentCount || 1)) * 100) : 0;
       const kycTrust = wallet?.kyc_status === 'verified' ? 95 : 30;
       const activityVolume = Math.min(100, ((shipmentCount || 0) / 10) * 100);
-      const financialHealth = Math.min(100, (wallet?.wallet_balance / 100000) * 100);
+      const financialHealth = wallet ? Math.min(100, (wallet.wallet_balance / 100000) * 100) : 0;
 
       const score = Math.round(
         (deliveryReliability * 0.3 +
@@ -207,7 +211,7 @@ export default function CreditScore() {
           10
       );
 
-      const analysis = `Based on your on-chain activity: You have completed ${deliveredCount || 0} deliveries with a ${deliveryReliability.toFixed(1)}% success rate. Your KYC status is ${wallet?.kyc_status} and you have ${shipmentCount || 0} total shipments. Current balance: ₹${wallet?.wallet_balance.toFixed(2)}.`;
+      const analysis = `Based on your on-chain activity: You have completed ${deliveredCount || 0} deliveries with a ${deliveryReliability.toFixed(1)}% success rate. Your KYC status is ${wallet?.kyc_status || 'pending'} and you have ${shipmentCount || 0} total shipments. Current balance: ₹${wallet?.wallet_balance.toFixed(2) || '0.00'}.`;
 
       const newScore: CreditScore = {
         score,
